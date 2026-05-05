@@ -18,6 +18,15 @@ class SurveyRepository {
     return result.map(SurveyRecordModel.fromMap).toList();
   }
 
+  Future<List<SurveyRecordModel>> getAll() async {
+    final db = await _db.database;
+    final maps = await db.query(
+      'survey_records',
+      orderBy: 'tanggal_survei DESC',
+    );
+    return maps.map((m) => SurveyRecordModel.fromMap(m)).toList();
+  }
+
   /// Ambil survei terkini untuk satu toko
   Future<SurveyRecordModel?> getLatestByStoreId(int storeId) async {
     final records = await getByStoreId(storeId);

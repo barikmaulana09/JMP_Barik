@@ -268,6 +268,18 @@ flutter upgrade
 
 ---
 
+## Screenshot Aplikasi
+
+### Dashboard
+<img src="assets/Dashboard.jpeg" width="250"/>
+
+### History
+<img src="assets/History.jpeg" width="250"/>
+
+### SplashScreen
+<img src="assets/SplashScreen.jpeg" width="250"/>
+
+
 ## 🤝 Kontribusi
 
 1. Fork repository ini
