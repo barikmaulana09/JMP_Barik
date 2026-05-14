@@ -9,6 +9,7 @@ import '../../data/models/survey_record_model.dart';
 import 'form_toko_screen.dart';
 import '../survey/form_survei_screen.dart';
 
+
 class DetailTokoScreen extends StatefulWidget {
   final StoreModel store;
   const DetailTokoScreen({super.key, required this.store});

@@ -40,6 +40,10 @@ class SurveyRecordModel {
     );
   }
 
+  get fotoPath => null;
+
+  get _fotoPath => null;
+
   Map<String, dynamic> toMap() {
     return {
       if (id != null) 'id': id,

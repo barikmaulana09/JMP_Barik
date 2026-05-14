@@ -4,6 +4,7 @@ import '../../core/utils/date_formatter.dart';
 import '../../data/repositories/survey_repository.dart';
 import '../../data/models/survey_record_model.dart';
 import '../../data/repositories/store_repository.dart';
+import '../survey/detail_survei_screen.dart';
 
 class RiwayatScreen extends StatefulWidget {
   const RiwayatScreen({super.key});
@@ -128,8 +129,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
     final jumlahCtrl =
         TextEditingController(text: survey.jumlahSaatIni.toString());
 
-    final catatanCtrl =
-        TextEditingController(text: survey.catatan ?? '');
+    final catatanCtrl = TextEditingController(text: survey.catatan ?? '');
 
     DateTime tanggal =
         DateTime.tryParse(survey.tanggalSurvei) ?? DateTime.now();
@@ -155,7 +155,6 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                       ),
                     ),
                   ),
-
                 TextField(
                   controller: jumlahCtrl,
                   keyboardType: TextInputType.number,
@@ -164,9 +163,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                     suffixText: 'pcs',
                   ),
                 ),
-
                 const SizedBox(height: 12),
-
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(
@@ -192,9 +189,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                     }
                   },
                 ),
-
                 const SizedBox(height: 8),
-
                 TextField(
                   controller: catatanCtrl,
                   maxLines: 2,
@@ -210,7 +205,6 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
               onPressed: () => Navigator.pop(ctx),
               child: const Text('Batal'),
             ),
-
             TextButton(
               onPressed: () async {
                 final jumlah = int.tryParse(jumlahCtrl.text);
@@ -220,9 +214,7 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 final updated = survey.copyWith(
                   jumlahSaatIni: jumlah,
                   tanggalSurvei: DateFormatter.toDb(tanggal),
-                  catatan: catatanCtrl.text.isEmpty
-                      ? null
-                      : catatanCtrl.text,
+                  catatan: catatanCtrl.text.isEmpty ? null : catatanCtrl.text,
                 );
 
                 await _surveyRepo.update(updated);
@@ -256,7 +248,6 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
             onPressed: () => Navigator.pop(context, false),
             child: const Text('Batal'),
           ),
-
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text(
@@ -286,34 +277,28 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
         actions: [
           PopupMenuButton<String>(
             icon: const Icon(Icons.sort),
-
             onSelected: (value) {
               setState(() {
                 _sortBy = value;
               });
             },
-
             itemBuilder: (_) => [
               const PopupMenuItem(
                 value: 'terbaru',
                 child: Text('Tanggal Terbaru'),
               ),
-
               const PopupMenuItem(
                 value: 'terlama',
                 child: Text('Tanggal Terlama'),
               ),
-
               const PopupMenuItem(
                 value: 'stok_terbanyak',
                 child: Text('Stok Terbanyak'),
               ),
-
               const PopupMenuItem(
                 value: 'stok_tersedikit',
                 child: Text('Stok Tersedikit'),
               ),
-
               const PopupMenuItem(
                 value: 'nama_toko',
                 child: Text('Nama Toko A-Z'),
@@ -324,44 +309,34 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 
         bottom: PreferredSize(
           preferredSize: const Size.fromHeight(56),
-
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-
             child: TextField(
               onChanged: (v) {
                 setState(() => _searchQuery = v);
               },
-
               decoration: InputDecoration(
                 hintText: 'Cari toko, petugas, tanggal...',
                 prefixIcon: const Icon(Icons.search, size: 20),
-
                 isDense: true,
-
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: 12,
                   vertical: 10,
                 ),
-
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
                 ),
-
                 filled: true,
                 fillColor: Colors.white.withValues(alpha: 0.9),
               ),
-
               style: const TextStyle(fontSize: 14),
             ),
           ),
         ),
       ),
-
       body: RefreshIndicator(
         onRefresh: _loadData,
-
         child: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(),
@@ -371,13 +346,28 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
                 : ListView.builder(
                     padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
                     itemCount: filtered.length,
-
                     itemBuilder: (_, i) {
                       final s = filtered[i];
 
                       return _RiwayatTile(
                         survey: s,
                         storeName: _storeNames[s.storeId] ?? '-',
+                        onTap: () async {
+                          final deleted = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => DetailSurveiScreen(
+                                survey: s,
+                                storeName: _storeNames[s.storeId] ?? '-',
+                              ),
+                            ),
+                          );
+
+                          // refresh jika data dihapus dari halaman detail
+                          if (deleted == true) {
+                            _loadData();
+                          }
+                        },
                         onEdit: () => _editSurvei(s),
                         onDelete: () => _deleteSurvei(s),
                       );
@@ -390,10 +380,8 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
   Widget _buildEmptyState() {
     return ListView(
       padding: const EdgeInsets.all(40),
-
       children: [
         const SizedBox(height: 60),
-
         Icon(
           _searchQuery.isEmpty
               ? Icons.history_toggle_off_rounded
@@ -401,32 +389,22 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
           size: 80,
           color: AppTheme.textSecondary.withValues(alpha: 0.4),
         ),
-
         const SizedBox(height: 20),
-
         Text(
-          _searchQuery.isEmpty
-              ? 'Belum Ada Riwayat'
-              : 'Tidak Ditemukan',
-
+          _searchQuery.isEmpty ? 'Belum Ada Riwayat' : 'Tidak Ditemukan',
           textAlign: TextAlign.center,
-
           style: const TextStyle(
             fontSize: 18,
             fontWeight: FontWeight.w600,
             color: AppTheme.textSecondary,
           ),
         ),
-
         const SizedBox(height: 8),
-
         Text(
           _searchQuery.isEmpty
               ? 'Riwayat kunjungan survei akan muncul di sini setelah Anda melakukan survei.'
               : 'Tidak ada hasil untuk "$_searchQuery". Coba kata kunci lain.',
-
           textAlign: TextAlign.center,
-
           style: const TextStyle(
             fontSize: 13,
             color: AppTheme.textSecondary,
@@ -443,12 +421,14 @@ class _RiwayatScreenState extends State<RiwayatScreen> {
 class _RiwayatTile extends StatelessWidget {
   final SurveyRecordModel survey;
   final String storeName;
+  final VoidCallback onTap;
   final VoidCallback onEdit;
   final VoidCallback onDelete;
 
   const _RiwayatTile({
     required this.survey,
     required this.storeName,
+    required this.onTap,
     required this.onEdit,
     required this.onDelete,
   });
@@ -457,18 +437,14 @@ class _RiwayatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.only(bottom: 10),
-
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-
         child: ListTile(
+          onTap: onTap,
           leading: CircleAvatar(
-            backgroundColor:
-                AppTheme.primary.withValues(alpha: 0.1),
-
+            backgroundColor: AppTheme.primary.withValues(alpha: 0.1),
             child: Text(
               '${survey.jumlahSaatIni}',
-
               style: const TextStyle(
                 fontWeight: FontWeight.bold,
                 color: AppTheme.primary,
@@ -476,106 +452,79 @@ class _RiwayatTile extends StatelessWidget {
               ),
             ),
           ),
-
           title: Text(
             storeName,
-
             style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),
-
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
               const SizedBox(height: 4),
-
               Row(
                 children: [
                   Icon(
                     Icons.calendar_today,
                     size: 12,
-                    color: AppTheme.textSecondary
-                        .withValues(alpha: 0.6),
+                    color: AppTheme.textSecondary.withValues(alpha: 0.6),
                   ),
-
                   const SizedBox(width: 4),
-
                   Text(
                     DateFormatter.toDisplay(
                       survey.tanggalSurvei,
                     ),
-
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppTheme.textSecondary
-                          .withValues(alpha: 0.8),
+                      color: AppTheme.textSecondary.withValues(alpha: 0.8),
                     ),
                   ),
-
                   const SizedBox(width: 12),
-
                   Icon(
                     Icons.person_outline,
                     size: 12,
-                    color: AppTheme.textSecondary
-                        .withValues(alpha: 0.6),
+                    color: AppTheme.textSecondary.withValues(alpha: 0.6),
                   ),
-
                   const SizedBox(width: 4),
-
                   Text(
                     survey.namaPetugas ?? '-',
-
                     style: TextStyle(
                       fontSize: 12,
-                      color: AppTheme.textSecondary
-                          .withValues(alpha: 0.8),
+                      color: AppTheme.textSecondary.withValues(alpha: 0.8),
                     ),
                   ),
                 ],
               ),
-
-              if (survey.catatan != null &&
-                  survey.catatan!.isNotEmpty) ...[
+              if (survey.catatan != null && survey.catatan!.isNotEmpty) ...[
                 const SizedBox(height: 4),
-
                 Text(
                   survey.catatan!,
-
                   style: const TextStyle(
                     fontSize: 11,
                     color: AppTheme.textSecondary,
                   ),
-
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ],
           ),
-
           trailing: PopupMenuButton<String>(
             icon: const Icon(
               Icons.more_vert,
               color: AppTheme.textSecondary,
             ),
-
             onSelected: (value) {
               if (value == 'edit') onEdit();
 
               if (value == 'delete') onDelete();
             },
-
             itemBuilder: (_) => [
               const PopupMenuItem(
                 value: 'edit',
-
                 child: Row(
                   children: [
                     Icon(
@@ -583,17 +532,13 @@ class _RiwayatTile extends StatelessWidget {
                       size: 18,
                       color: AppTheme.primary,
                     ),
-
                     SizedBox(width: 8),
-
                     Text('Edit'),
                   ],
                 ),
               ),
-
               const PopupMenuItem(
                 value: 'delete',
-
                 child: Row(
                   children: [
                     Icon(
@@ -601,9 +546,7 @@ class _RiwayatTile extends StatelessWidget {
                       size: 18,
                       color: AppTheme.error,
                     ),
-
                     SizedBox(width: 8),
-
                     Text(
                       'Hapus',
                       style: TextStyle(color: AppTheme.error),
